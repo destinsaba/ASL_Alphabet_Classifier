@@ -20,8 +20,8 @@ def main():
     import torch.optim as optim
     from torch.optim.lr_scheduler import ExponentialLR
 
-    DEV_PATH  = "./asl_alphabet_train/asl_alphabet_train"
-    TEST_PATH   = "./asl_alphabet_test/asl_alphabet_test"
+    DEV_PATH  = "/home/destin.saba/transfer-learning/ASL_data/asl_alphabet_train/asl_alphabet_train"
+    TEST_PATH   = "/home/destin.saba/transfer-learning/ASL_data/asl_alphabet_test/asl_alphabet_test"
 
     # Transforms 
     torchvision_transform = transforms.Compose([transforms.Resize((224,224)),\
