@@ -44,4 +44,4 @@ def move_images_for_all_subdirectories(train_path, test_path, num_images):
 # remove_postfix_from_files(TEST_PATH)
 
 # Run the function to move images for all subdirectories
-move_images_for_all_subdirectories(TRAIN_PATH, TEST_PATH, NUM_IMAGES_TO_MOVE)
+# move_images_for_all_subdirectories(TRAIN_PATH, TEST_PATH, NUM_IMAGES_TO_MOVE)
