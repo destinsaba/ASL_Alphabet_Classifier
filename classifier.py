@@ -18,7 +18,7 @@ HYPERPARAMETERS = {
     "project_name": "ASL Classifier",
     "entity": "destinsaba-fun",
     "learning_rate": 0.001,
-    "epochs": 5,
+    "epochs": 15,
     "batch_size": 32,
     "num_workers": 2,
     "train_ratio": 0.8,
@@ -92,7 +92,7 @@ def main():
     train_batch = next(train_iterator)
 
     class ASLModel(nn.Module):
-        def __init__(self,  num_classes, input_shape, transfer=False):
+        def __init__(self,  num_classes, input_shape, transfer=False, unfreeze_layers=2):
             super().__init__()
 
             self.transfer = transfer
@@ -108,6 +108,10 @@ def main():
                 # freeze params
                 for param in self.feature_extractor.parameters():
                     param.requires_grad = False
+
+                # Unfreeze the last few layers
+                for param in list(self.feature_extractor.parameters())[-unfreeze_layers:]:
+                    param.requires_grad = True
 
             n_features = self._get_conv_output(self.input_shape)
             self.classifier = nn.Linear(n_features, num_classes)
@@ -128,7 +132,7 @@ def main():
 
             return x
 
-    net = ASLModel(HYPERPARAMETERS["num_classes"], HYPERPARAMETERS["input_shape"], True)
+    net = ASLModel(HYPERPARAMETERS["num_classes"], HYPERPARAMETERS["input_shape"], True, unfreeze_layers=2)
     net.to(device)
 
     criterion = nn.CrossEntropyLoss() # Loss function
@@ -187,8 +191,8 @@ def main():
 
     # Load the best model to be used in the test set
     net = ASLModel(HYPERPARAMETERS["num_classes"], HYPERPARAMETERS["input_shape"], False)
-    net.to(device)
     net.load_state_dict(torch.load(PATH))
+    net.to(device)
     net.eval()
 
     print('Starting Testing')
@@ -199,6 +203,7 @@ def main():
     with torch.no_grad():
         for data in testloader:
             images, labels = data
+            images, labels = images.to(device), labels.to(device)  # Move data to GPU
             # calculate outputs by running images through the network
             outputs = net(images)
             # the class with the highest energy is what we choose as prediction
@@ -214,5 +219,5 @@ def main():
 
     print(total)
 
-if __name__ == "__main__":    
+if __name__ == "__main__":
     main()
