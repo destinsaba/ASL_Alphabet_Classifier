@@ -30,32 +30,6 @@ HYPERPARAMETERS = {
     "model_path": './ASL_net.pth'
 }
 
-TEST_PATH = "./asl_alphabet_test/asl_alphabet_test"
-TRAIN_PATH = "./asl_alphabet_train/asl_alphabet_train"
-NUM_IMAGES_TO_MOVE = 600
-
-def remove_postfix_from_files(test_path, postfix="_test"):
-    # Walk through all subdirectories and files
-    for root, dirs, files in os.walk(test_path):
-        for file in files:
-            # Check if the file name contains the postfix
-            if postfix in file:
-                # Create the new file name by removing the postfix
-                new_file_name = file.replace(postfix, '')
-                # Rename the file
-                os.rename(os.path.join(root, file), os.path.join(root, new_file_name))
-
-def move_images(src_dir, dest_dir, num_images):
-    # Get a list of all files in the source directory
-    files = os.listdir(src_dir)
-    # Ensure we only move the specified number of images
-    files_to_move = files[:num_images]
-    for file in files_to_move:
-        # Construct full file path
-        src_file = os.path.join(src_dir, file)
-        dest_file = os.path.join(dest_dir, file)
-        # Move the file
-        shutil.move(src_file, dest_file)
 
 def main():
     # Initialize wandb
@@ -236,11 +210,5 @@ def main():
 
     print(total)
 
-if __name__ == "__main__":
-    # Run the function to remove postfix from files
-    remove_postfix_from_files(TEST_PATH)
-
-    # Run the function to move images
-    move_images(os.path.join(TRAIN_PATH, 'A'), os.path.join(TEST_PATH, 'A'), NUM_IMAGES_TO_MOVE)
-    
+if __name__ == "__main__":    
     main()
