@@ -48,14 +48,20 @@ def main():
     TEST_PATH = HYPERPARAMETERS["test_path"]
 
     # Transforms 
-    torchvision_transform = transforms.Compose([transforms.Resize((224,224)),\
-        transforms.RandomHorizontalFlip(), transforms.RandomVerticalFlip(),
-        transforms.ToTensor(),transforms.Normalize(mean=[0.485, 0.456, 0.406] ,std=[0.229, 0.224, 0.225] )])
+    torchvision_transform = transforms.Compose([
+        transforms.Resize((224, 224)),
+        transforms.RandomRotation(10),  # Random rotation
+        transforms.RandomResizedCrop(224, scale=(0.8, 1.0)),  # Random cropping
+        transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.2),  # Color jitter
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+    ])
 
-
-    torchvision_transform_test = transforms.Compose([transforms.Resize((224,224)),\
-        transforms.ToTensor(),transforms.Normalize(mean=[0.485, 0.456, 0.406] ,std=[0.229, 0.224, 0.225])])
-
+    torchvision_transform_test = transforms.Compose([
+        transforms.Resize((224, 224)),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+    ])
 
     # Load datasets
     development_dataset = ImageFolder(root=DEV_PATH, transform=torchvision_transform)
