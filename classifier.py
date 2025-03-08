@@ -18,7 +18,7 @@ HYPERPARAMETERS = {
     "project_name": "ASL Classifier",
     "entity": "destinsaba-fun",
     "learning_rate": 0.001,
-    "epochs": 15,
+    "epochs": 25,
     "batch_size": 32,
     "num_workers": 2,
     "train_ratio": 0.8,
