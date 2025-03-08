@@ -5,12 +5,62 @@ from torch.utils.data import Dataset
 import torch.nn as nn
 import numpy as np
 from PIL import Image
-from torchvision.models import resnet18
+from torchvision.models import resnet50
 from torchvision import transforms, models
 from torchvision.datasets import ImageFolder
 from torch.utils.data import DataLoader
+import wandb
+import os
+import shutil
+
+# Define hyperparameters
+HYPERPARAMETERS = {
+    "project_name": "ASL Classifier",
+    "entity": "destinsaba-fun",
+    "learning_rate": 0.001,
+    "epochs": 5,
+    "batch_size": 32,
+    "num_workers": 2,
+    "train_ratio": 0.8,
+    "val_ratio": 0.2,
+    "dev_path": "/home/destin.saba/transfer-learning/ASL_data/asl_alphabet_train/asl_alphabet_train",
+    "test_path": "/home/destin.saba/transfer-learning/ASL_data/asl_alphabet_test/asl_alphabet_test",
+    "input_shape": (3, 224, 224),
+    "num_classes": 29,
+    "model_path": './ASL_net.pth'
+}
+
+TEST_PATH = "./asl_alphabet_test/asl_alphabet_test"
+TRAIN_PATH = "./asl_alphabet_train/asl_alphabet_train"
+NUM_IMAGES_TO_MOVE = 600
+
+def remove_postfix_from_files(test_path, postfix="_test"):
+    # Walk through all subdirectories and files
+    for root, dirs, files in os.walk(test_path):
+        for file in files:
+            # Check if the file name contains the postfix
+            if postfix in file:
+                # Create the new file name by removing the postfix
+                new_file_name = file.replace(postfix, '')
+                # Rename the file
+                os.rename(os.path.join(root, file), os.path.join(root, new_file_name))
+
+def move_images(src_dir, dest_dir, num_images):
+    # Get a list of all files in the source directory
+    files = os.listdir(src_dir)
+    # Ensure we only move the specified number of images
+    files_to_move = files[:num_images]
+    for file in files_to_move:
+        # Construct full file path
+        src_file = os.path.join(src_dir, file)
+        dest_file = os.path.join(dest_dir, file)
+        # Move the file
+        shutil.move(src_file, dest_file)
 
 def main():
+    # Initialize wandb
+    wandb.init(project=HYPERPARAMETERS["project_name"], entity=HYPERPARAMETERS["entity"])
+
     # Check if GPU is available
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
@@ -20,8 +70,8 @@ def main():
     import torch.optim as optim
     from torch.optim.lr_scheduler import ExponentialLR
 
-    DEV_PATH  = "/home/destin.saba/transfer-learning/ASL_data/asl_alphabet_train/asl_alphabet_train"
-    TEST_PATH   = "/home/destin.saba/transfer-learning/ASL_data/asl_alphabet_test/asl_alphabet_test"
+    DEV_PATH = HYPERPARAMETERS["dev_path"]
+    TEST_PATH = HYPERPARAMETERS["test_path"]
 
     # Transforms 
     torchvision_transform = transforms.Compose([transforms.Resize((224,224)),\
@@ -38,19 +88,20 @@ def main():
     test_dataset = ImageFolder(root=TEST_PATH, transform=torchvision_transform_test)
 
     # Define the split ratio for training and validation datasets
-    train_ratio = 0.8
-    val_ratio = 0.2
+    train_ratio = HYPERPARAMETERS["train_ratio"]
+    val_ratio = HYPERPARAMETERS["val_ratio"]
 
     # Calculate the sizes of each dataset
     train_size = int(train_ratio * len(development_dataset))
     val_size = len(development_dataset) - train_size
 
     # Split the development dataset into training and validation datasets
-    train_dataset, val_dataset = torch.utils.data.random_split(development_dataset, [train_size, val_size])
+    generator = torch.Generator().manual_seed(42)
+    train_dataset, val_dataset = torch.utils.data.random_split(development_dataset, [train_size, val_size], generator=generator)
 
     # Define batch size and number of workers (adjust as needed)
-    batch_size = 32
-    num_workers = 2
+    batch_size = HYPERPARAMETERS["batch_size"]
+    num_workers = HYPERPARAMETERS["num_workers"]
 
     # Create data loaders
     trainloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
@@ -75,7 +126,7 @@ def main():
             self.input_shape = input_shape
 
             # transfer learning if weights=True
-            self.feature_extractor = models.resnet18(weights=models.ResNet18_Weights.DEFAULT)
+            self.feature_extractor = models.resnet50(weights=models.ResNet50_Weights.DEFAULT)
 
             if self.transfer:
                 # layers are frozen by using eval()
@@ -103,15 +154,18 @@ def main():
 
             return x
 
-    net = ASLModel(29, (3,200,200), True)
+    net = ASLModel(HYPERPARAMETERS["num_classes"], HYPERPARAMETERS["input_shape"], True)
     net.to(device)
 
     criterion = nn.CrossEntropyLoss() # Loss function
-    optimizer = torch.optim.AdamW(net.parameters(), lr = 0.001)
+    optimizer = torch.optim.AdamW(net.parameters(), lr=HYPERPARAMETERS["learning_rate"])
     scheduler = ExponentialLR(optimizer, gamma=0.9)
 
-    nepochs = 5
-    PATH = './ASL_net.pth' # Path to save the best model
+    # Log hyperparameters
+    wandb.config.update(HYPERPARAMETERS)
+
+    nepochs = HYPERPARAMETERS["epochs"]
+    PATH = HYPERPARAMETERS["model_path"] # Path to save the best model
 
     best_loss = 1e+20
     for epoch in range(nepochs):  # loop over the dataset multiple times
@@ -146,6 +200,9 @@ def main():
                 val_loss += loss.item()
             print(f'val loss: {val_loss / i:.3f}')
 
+            # Log metrics
+            wandb.log({"train_loss": train_loss / i, "val_loss": val_loss / i})
+
             # Save best model
             if val_loss < best_loss:
                 print("Saving model")
@@ -155,9 +212,8 @@ def main():
     print('Finished Training')
 
     # Load the best model to be used in the test set
-    net = ASLModel(29, (3,200,200), False)
+    net = ASLModel(HYPERPARAMETERS["num_classes"], HYPERPARAMETERS["input_shape"], False)
     net.load_state_dict(torch.load(PATH))
-    #net.load_state_dict(torch.load(PATH))
 
     correct = 0
     total = 0
@@ -172,9 +228,19 @@ def main():
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
 
-    print(f'Accuracy of the network on the test images: {100 * correct / total} %')
+    accuracy = 100 * correct / total
+    print(f'Accuracy of the network on the test images: {accuracy} %')
+
+    # Log final accuracy
+    wandb.log({"test_accuracy": accuracy})
 
     print(total)
 
 if __name__ == "__main__":
+    # Run the function to remove postfix from files
+    remove_postfix_from_files(TEST_PATH)
+
+    # Run the function to move images
+    move_images(os.path.join(TRAIN_PATH, 'A'), os.path.join(TEST_PATH, 'A'), NUM_IMAGES_TO_MOVE)
+    
     main()
