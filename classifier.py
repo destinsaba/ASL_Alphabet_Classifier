@@ -187,7 +187,11 @@ def main():
 
     # Load the best model to be used in the test set
     net = ASLModel(HYPERPARAMETERS["num_classes"], HYPERPARAMETERS["input_shape"], False)
+    net.to(device)
     net.load_state_dict(torch.load(PATH))
+    net.eval()
+
+    print('Starting Testing')
 
     correct = 0
     total = 0
