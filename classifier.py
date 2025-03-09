@@ -31,7 +31,7 @@ HYPERPARAMETERS = {
 }
 
 class ASLModel(nn.Module):
-    def __init__(self,  num_classes, input_shape, transfer=False, unfreeze_blocks=1):
+    def __init__(self,  num_classes, input_shape, transfer=False, unfreeze_blocks=3):
         super().__init__()
 
         self.transfer = transfer
