@@ -31,7 +31,7 @@ HYPERPARAMETERS = {
 }
 
 class ASLModel(nn.Module):
-    def __init__(self,  num_classes, input_shape, transfer=False, unfreeze_blocks=3):
+    def __init__(self,  num_classes, input_shape, transfer=False, unfreeze_layers=2):
         super().__init__()
 
         self.transfer = transfer
@@ -46,10 +46,10 @@ class ASLModel(nn.Module):
             self.feature_extractor.eval()
             # freeze params
             for param in self.feature_extractor.parameters():
-                param.requires_grad = False            
+                param.requires_grad = False
 
             # Unfreeze the last few layers
-            for param in list(self.feature_extractor.layer4.parameters())[-(unfreeze_blocks):]:
+            for param in list(self.feature_extractor.parameters())[-unfreeze_layers:]:
                 param.requires_grad = True
 
         n_features = self._get_conv_output(self.input_shape)
@@ -137,7 +137,7 @@ def main():
     train_iterator = iter(trainloader)
     train_batch = next(train_iterator)
 
-    net = ASLModel(HYPERPARAMETERS["num_classes"], HYPERPARAMETERS["input_shape"], True, unfreeze_blocks=1)
+    net = ASLModel(HYPERPARAMETERS["num_classes"], HYPERPARAMETERS["input_shape"], True, unfreeze_layers=2)
     net.to(device)
 
     criterion = nn.CrossEntropyLoss() # Loss function
