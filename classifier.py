@@ -44,6 +44,9 @@ class ASLModel(nn.Module):
         if self.transfer:
             # layers are frozen by using eval()
             self.feature_extractor.eval()
+            # freeze params
+            for param in self.feature_extractor.parameters():
+                param.requires_grad = False
 
             # Unfreeze the last few layers
             for param in list(self.feature_extractor.parameters())[-unfreeze_layers:]:
