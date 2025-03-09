@@ -53,6 +53,7 @@ class ASLModel(nn.Module):
                 param.requires_grad = True
 
         n_features = self._get_conv_output(self.input_shape)
+        self.relu = nn.ReLU(inplace=True)
         self.classifier = nn.Linear(n_features, num_classes)
 
     def _get_conv_output(self, shape):
@@ -67,6 +68,7 @@ class ASLModel(nn.Module):
     def forward(self, x):
         x = self.feature_extractor(x)
         x = x.view(x.size(0), -1)
+        x = self.relu(x)
         x = self.classifier(x)
 
         return x
