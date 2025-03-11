@@ -153,6 +153,8 @@ def main():
     PATH = HYPERPARAMETERS["model_path"] # Path to save the best model
 
     best_loss = 1e+20
+    patience = 5
+    epochs_no_improve = 0
     for epoch in range(nepochs):  # loop over the dataset multiple times
         # Training Loop
         train_loss = 0.0
@@ -193,6 +195,14 @@ def main():
                 print("Saving model")
                 torch.save(net.state_dict(), PATH)
                 best_loss = val_loss
+                epochs_no_improve = 0
+            else:
+                epochs_no_improve += 1
+
+            # Check if we have reached patience
+            if epochs_no_improve >= patience:
+                print(f"Early stopping triggered after {patience} epochs of no improvement in validation loss.")
+                break
 
     print('Finished Training')
 
