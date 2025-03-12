@@ -1,2 +1,4 @@
 ASL_net.pth
 __pycache__/
+wandb/
+ASL_early_stop.slurm
