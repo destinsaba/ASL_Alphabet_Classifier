@@ -1,3 +1,6 @@
 ASL_net.pth
 __pycache__/
 wandb/
+jupyter_job.slurm
+jupyter_log.out
+.ipynb_checkpoints/
