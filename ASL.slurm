@@ -15,6 +15,6 @@
 source ~/software/init-conda
 conda activate pytorch
 
-wandb login a384217417d4fb3d48a2b619be42f80bf3f7fd26
+wandb login 7239c9bb9691e04b4b97fd0cab3bc8d69e3d5cac
 
-python /home/destin.saba/transfer-learning/ASLclassifier.py
+python /home/rana.elsadig/ASL_Alphabet_Classifier/classifier.py
