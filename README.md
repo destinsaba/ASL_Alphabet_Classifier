@@ -44,7 +44,7 @@ The dataset has been split into two main folders:
 3. Set up Weights & Biases (wandb) for experiment tracking
 
 ## Training the Model
-To train the model, run the `classifier.py` script. This script will train the model on the ASL Alphabet dataset and save the best model based on validation loss. We have also provided a SLURM file to facilitate training on the TALC cluster. Alternatively, download the previously-trained best_model here: [https://drive.google.com/file/d/1L0SPc-Wms54PWnAQkrNqIPBqRL94efO9/view?usp=sharing]
+To train the model, run the `classifier.py` script. This script will train the model on the ASL Alphabet dataset and save the best model based on validation loss. We have also provided a SLURM file to facilitate training on the TALC cluster. **Alternatively, download the previously trained best_model.pth [here](https://drive.google.com/file/d/1L0SPc-Wms54PWnAQkrNqIPBqRL94efO9/view?usp=sharing)**
 
 ## Evaluating the Model
 To evaluate the model, use the `model_evaluation.ipynb` Jupyter Notebook. This notebook will load the best model, evaluate it on the test dataset, and provide various metrics such as accuracy, confusion matrix, and classification report.
