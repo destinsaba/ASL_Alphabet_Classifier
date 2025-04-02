@@ -23,17 +23,17 @@ The dataset has been split into two main folders:
 - wandb
 
 ## Repo Contents
-`classifier.py` Training of our neural network model on ASL dataset.
+`classifier.py`: Training of our neural network model on ASL dataset.
 
-`live_test.py` Script for live inference with webcam.
+`live_test.py`: Script for live inference with webcam.
 
-`model_evaluation.ipynb` Jupyter notebook with test metrics and visualizations.
+`model_evaluation.ipynb`: Jupyter notebook with test metrics and visualizations.
 
-`ASL.slurm` `job_output.log` Script for running on TALC and output log.
+`ASL.slurm` `job_output.log`: Script for running on TALC and output log.
 
-`asl_alphabet_train` `asl_alphabet_test` Dataset split into training and testing sets.
+`asl_alphabet_train` `asl_alphabet_test`: Dataset split into training and testing sets.
 
-`archive` Unused and utility scripts.
+`archive`: Unused and utility scripts.
 
 ## Setup
 
@@ -47,13 +47,13 @@ The dataset has been split into two main folders:
 To train the model, run the `classifier.py` script. This script will train the model on the ASL Alphabet dataset and save the best model based on validation loss. We have also provided a SLURM file to facilitate training on the TALC cluster. Alternatively, download the previously-trained best_model here: [https://drive.google.com/file/d/1L0SPc-Wms54PWnAQkrNqIPBqRL94efO9/view?usp=sharing]
 
 ## Evaluating the Model
-To evaluate the model, use the model_evaluation.ipynb Jupyter Notebook. This notebook will load the best model, evaluate it on the test dataset, and provide various metrics such as accuracy, confusion matrix, and classification report.
+To evaluate the model, use the `model_evaluation.ipynb` Jupyter Notebook. This notebook will load the best model, evaluate it on the test dataset, and provide various metrics such as accuracy, confusion matrix, and classification report.
 
 ## Live Testing with Webcam
-To test the classifier with your computer's webcam, run the live_test.py script. This script will capture video from the webcam, classify each frame, and display the predicted class on the screen.
+To test the classifier with your computer's webcam, run the `live_test.py` script. This script will capture video from the webcam, classify each frame, and display the predicted class on the screen.
 
 ## Results
-The model achieves high accuracy on the test dataset. Detailed results, including accuracy, confusion matrix, and classification report, can be found in the model_evaluation.ipynb notebook.
+The model achieves high accuracy on the test dataset. Detailed results, including accuracy, confusion matrix, and classification report, can be found in the `model_evaluation.ipynb` notebook.
 
 ## Acknowledgements
 - The ASL Alphabet dataset is provided by Kaggle.
