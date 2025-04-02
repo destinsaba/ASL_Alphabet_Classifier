@@ -22,6 +22,19 @@ The dataset has been split into two main folders:
 - tqdm
 - wandb
 
+## Repo Contents
+`classifier.py` Training of our neural network model on ASL dataset.
+
+`live_test.py` Script for live inference with webcam.
+
+`model_evaluation.ipynb` Jupyter notebook with test metrics and visualizations.
+
+`ASL.slurm` `job_output.log` Script for running on TALC and output log.
+
+`asl_alphabet_train` `asl_alphabet_test` Dataset split into training and testing sets.
+
+`archive` Unused and utility scripts.
+
 ## Setup
 
 1. Clone the repository
